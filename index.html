@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>To-Do App</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        padding-top: 50px;
+    }
+
+    .container {
+        width: 400px;
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    input {
+        width: 70%;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+    }
+
+    button {
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .add-btn {
+        background: #22c55e;
+        color: white;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+
+    li {
+        background: #334155;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .done {
+        text-decoration: line-through;
+        opacity: 0.6;
+    }
+
+    .delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .check {
+        margin-right: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>To-Do App</h1>
+
+    <input type="text" id="taskInput" placeholder="New task...">
+    <button class="add-btn" onclick="addTask()">Add</button>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function renderTasks() {
+    let list = document.getElementById("taskList");
+    list.innerHTML = "";
+
+    tasks.forEach((task, index) => {
+        let li = document.createElement("li");
+
+        let left = document.createElement("div");
+
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.done;
+        checkbox.className = "check";
+
+        checkbox.onchange = function () {
+            tasks[index].done = checkbox.checked;
+            saveTasks();
+            renderTasks();
+        };
+
+        let span = document.createElement("span");
+        span.textContent = task.text;
+        if (task.done) span.classList.add("done");
+
+        left.appendChild(checkbox);
+        left.appendChild(span);
+
+        let delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.className = "delete";
+        delBtn.onclick = function () {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        };
+
+        li.appendChild(left);
+        li.appendChild(delBtn);
+
+        list.appendChild(li);
+    });
+}
+
+function addTask() {
+    let input = document.getElementById("taskInput");
+
+    if (input.value.trim() === "") {
+        alert("Write a task!");
+        return;
+    }
+
+    tasks.push({
+        text: input.value,
+        done: false
+    });
+
+    input.value = "";
+    saveTasks();
+    renderTasks();
+}
+
+renderTasks();
+</script>
+
+</body>
+</html>
